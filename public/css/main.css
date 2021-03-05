@@ -48,7 +48,12 @@ main {
 .main-header__item a:hover,
 .main-header__item a:active,
 .main-header__item a.active {
-  color: #ffe6d9;
+  color: #fff7f2;
+}
+
+.main-header__item a:active,
+.main-header__item a.active {
+  border-bottom: 1px solid rgba(255, 230, 217, 0.5);
 }
 
 .grid {
