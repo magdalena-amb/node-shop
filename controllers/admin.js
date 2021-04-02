@@ -33,8 +33,14 @@ exports.getAddProduct = (req, res, next) => {
 
   exports.postEditProduct = (req, res, next) => {
     const { productId, title, imageUrl, price, description }= req.body;
-      const product = new Product(title, imageUrl, price, description, productId);
-    product.save()
+    Product.findById(productId)
+    .then(product => {
+      product.title = title;
+      product.imageUrl = imageUrl;
+      product.price = price;
+      product.description = description;
+     return product.save() 
+    })
     .then(result => {
       console.log('Updated Product!')
       res.redirect('/admin/products')
@@ -44,7 +50,8 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
     const {title, imageUrl, price, description } = req.body;
-    const product = new Product(title, imageUrl, price, description, null, req.user._id);
+    const product = new Product({
+      title, imageUrl, price, description, userId:req.user});
     product.save()
     .then(result => {
       console.log('Created Product');
@@ -57,21 +64,25 @@ exports.postAddProduct = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const { productId } = req.body;
-  Product.deleteById(productId)
+  Product.findByIdAndRemove(productId)
   .then( ()=> {
     console.log('Destroyed product!')
     res.redirect('/admin/products');
   })
-  .catch( err => console.log(err))
+  .catch( err => console.log(err));
 }
 
 exports.getProducts = (req, res, next ) => {
-  Product.fetchAll()
+  Product.find()
+  // .select('title price -_id')
+  // .populate('userId')
   .then(products => {
+    console.log(products);
     res.render('admin/products', {
       pageTitle: 'Admin Products',
       path: '/admin/products',
        products
        });
-  });
+  })
+  .catch( err => console.log(err));
 }
